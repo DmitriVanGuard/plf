@@ -9,5 +9,8 @@
 		"es6": true, //Not change global var-ls like that exist in es6?
 		"browser": true, // -//- window, document
 		"node": true //process.env
+	},
+	"rules": {
+		"no-console": "off"
 	}
 }
