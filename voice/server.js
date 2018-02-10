@@ -47,23 +47,22 @@ WSS.on('connection', wsClient => {
 					sendTo(wsClient, { type: 'join', success: false });
 					break;
 				}
-				console.log(`User[${data.name}] joined room ${data.room}`);
+				console.log(`User[${chalk.green(data.name)}] joined room ${chalk.green(data.room)}`);
 				sendTo(wsClient, { type: 'join', success: true, users: getExistingRoomUserNames(data.room) });
-				wsClient.name = data.name;
-				wsClient.id = generateUserIDinRoom(data.room);
 
+				wsClient.name = data.name;
 				WSS.broadcast(data.room, { type: 'newUser', name: data.name });
 
 				WSS.rooms[data.room].push(wsClient);
 				// console.log(WSS.rooms);
 				break;
 
-			case 'broadcast':
-				// broadcast(data.room, data.msg);
-				break;
+			case 'leave':
+				const userIndex = WSS.rooms[data.room].indexOf(wsClient);
+				console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
+				WSS.broadcast(data.room, { type: 'leave', name: wsClient.name });
 
-			case 'msg':
-				console.log('message: ', data.msg);
+				if (userIndex !== -1) WSS.rooms[data.room].splice(userIndex, 1);
 				break;
 
 			default:
@@ -93,9 +92,6 @@ function isNameInUseInChosenRoom(name, room) {
 }
 function getExistingRoomUserNames(room) {
 	return WSS.rooms[room].map(socket => socket.name);
-}
-function generateUserIDinRoom(room) {
-	return WSS.rooms[room].length;
 }
 WSS.broadcast = (room, data, exceptClient = null) => {
 	WSS.rooms[room].forEach(client => {

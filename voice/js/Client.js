@@ -12,12 +12,18 @@ export default class Client {
 	sendJSONToServer(data) {
 		this.ws.send(JSON.stringify(data));
 	}
-	joinChannel(room) {
+	joinRoom(room) {
 		this.room = room;
 		this.sendJSONToServer({
 			type: 'join',
-			room,
+			room: this.room,
 			name: this.name
+		});
+	}
+	leaveRoom() {
+		this.sendJSONToServer({
+			type: 'leave',
+			room: this.room
 		});
 	}
 
@@ -55,7 +61,7 @@ export default class Client {
 				case 'newUser':
 					this._onNewUserCallback(data);
 					break;
-				case 'left':
+				case 'leave':
 					this._onLeaveCallback(data);
 					break;
 				default:
