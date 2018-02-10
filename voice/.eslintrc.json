@@ -12,6 +12,8 @@
 	},
 	"rules": {
 		"no-console": "off",
-		"no-param-reassign": "off"
+		"no-param-reassign": "off",
+		"no-underscore-dangle": "off",
+		"no-plusplus": "off"
 	}
 }

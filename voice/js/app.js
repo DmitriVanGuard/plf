@@ -1,8 +1,9 @@
 import Client from './client';
+// import WSHandlers from './WSHandlers';
 
 const ws = new WebSocket('ws://localhost:8000');
 const client = new Client(ws);
-
+// const wsHandlers = new WSHandlers(ws);
 const { loginForm } = document.forms;
 
 loginForm.loginBtn.onclick = () => {
@@ -25,8 +26,10 @@ ws.onmessage = message => {
 	switch (data.type) {
 		case 'join':
 			console.log(data);
+			handleJoin(data);
 			break;
 		case 'newUser':
+			updateUsersList(data.name);
 			console.log(data);
 			break;
 		default:
@@ -34,6 +37,55 @@ ws.onmessage = message => {
 			break;
 	}
 };
+
+/* ******************** */
+/*	DOM ELEMENTS				*/
+/* ******************** */
+const currentRoomNode = document.getElementById('currentRoom');
+const userNameNode = document.getElementById('userName');
+const usersListNode = document.getElementById('usersList');
+
+function handleJoin(data) {
+	if (data.success === false) return alert('Пожалуйста, выберите другое имя');
+
+	currentRoomNode.textContent = client.room;
+	userNameNode.textContent = client.name;
+
+	updateUsersList(data.users);
+
+	return console.log('Login successful');
+}
+
+function updateUsersList(users) {
+	const arrayOfUserNames = Array.isArray(users);
+	let nodeToAppend = null;
+	console.log(users);
+	if (arrayOfUserNames === true) {
+		const frag = document.createDocumentFragment();
+		for (let i = 0; i < users.length; i++) {
+			const item = document.createElement('li');
+			item.textContent = users[i];
+
+			const audio = document.createElement('audio');
+			audio.controls = true;
+			item.appendChild(audio);
+
+			frag.appendChild(item);
+		}
+		nodeToAppend = frag;
+	} else {
+		// users это не массив, а String - одно единственное имя
+		const item = document.createElement('li');
+		item.textContent = users;
+
+		const audio = document.createElement('audio');
+		audio.controls = true;
+		item.appendChild(audio);
+
+		nodeToAppend = item;
+	}
+	return usersListNode.appendChild(nodeToAppend);
+}
 
 /*
 	var group = document.getElementById('group').textContent;
