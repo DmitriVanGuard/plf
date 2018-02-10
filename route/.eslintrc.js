@@ -1,8 +1,8 @@
-{
+module.exports = {
 	"extends": [
-		"airbnb",
-		"prettier",
-	],
+		"airbnb-base",
+		"prettier"
+		],
 	"plugins": [
 		"prettier"
 	],
@@ -16,5 +16,4 @@
 		"browser": true, // -//- window, document
 		"node": true, //process.env
 	}
-}
-
+};

@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "NODE_ENV=production webpack -p",
+    "watch": "webpack --watch",
+    "lint": "eslint **/*.js --quiet",
+    "format": "prettier --write --single-quote --use-tabs --tab-width=1 --print-width=120 --parser=flow \"js/**/*.{js,jsx}\"",
+    "start": "NODE_ENV=server node server.js"
   },
   "keywords": [],
   "author": "",
@@ -15,9 +19,14 @@
     "ws": "^4.0.0"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.1",
     "eslint": "^4.17.0",
-    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-prettier": "^2.9.0",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-prettier": "^2.6.0",
     "prettier": "^1.10.2"
   }
 }

@@ -3,7 +3,7 @@ const webpack = require('webpack');
 
 const config = {
 	context: __dirname,
-	entry: ['./js/ClientApp.jsx'],
+	entry: ['./js/app.js'],
 	devtool: 'cheap-eval-source-map',
 	output: {
 		path: path.join(__dirname, 'public'),
