@@ -1,0 +1,33 @@
+{
+  "name": "route",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "NODE_ENV=production webpack -p",
+    "watch": "webpack --watch",
+    "lint": "eslint **/*.js --quiet",
+    "format": "prettier --write --single-quote --use-tabs --tab-width=1 --print-width=120 --parser=flow \"js/**/*.js\"",
+    "dev": "NODE_ENV=server nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-static": "^0.7.10",
+    "nodemon": "^1.14.12",
+    "webpack": "^3.10.0",
+    "ws": "^4.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.17.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "prettier": "^1.10.2"
+  }
+}
