@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^2.3.0",
     "node-static": "^0.7.10",
     "nodemon": "^1.14.12",
     "webpack": "^3.10.0",

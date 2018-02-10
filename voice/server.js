@@ -3,6 +3,7 @@ const PORT = 8000;
 const staticNode = require('node-static');
 const WebSocket = require('ws');
 const http = require('http');
+const chalk = require('chalk');
 
 const file = new staticNode.Server('./public');
 
@@ -15,6 +16,8 @@ const server = http
 			.resume();
 	})
 	.listen(PORT);
+
+console.log(chalk.yellow('Server is running on port -> ') + chalk.bgGreen(chalk.black(PORT)));
 
 const WSS = new WebSocket.Server({ server });
 
@@ -38,8 +41,7 @@ WSS.rooms = {
 };
 
 WSS.on('connection', wsClient => {
-	console.log(`User connected`);
-	// ws.room = [];
+	console.log(chalk.cyan(`New connection established`));
 
 	/* WHEN CLIENT SEND MESSAGE */
 	wsClient.on('message', message => {
@@ -92,13 +94,15 @@ WSS.on('connection', wsClient => {
 			console.log(`User[${wsClient.name}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
 		}
 	});
+
+	wsClient.on('error', () => console.log(chalk.red(`Some error after closing browsers`)));
 });
 
-function broadcast(room, message) {
+/*function broadcast(room, message) {
 	console.log(`Broadcasting message [${message}] to the room -> ${room}.`);
 	WSS.clients.forEach(client => {
 		if (client.room.indexOf(room) > -1) {
 			client.send(message);
 		}
 	});
-}
+}*/
