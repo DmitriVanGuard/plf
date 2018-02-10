@@ -27,12 +27,18 @@ WSS.broadcast = (data, exceptClient = null) => {
 		if (client !== exceptClient && client.readyState === WebSocket.OPEN) client.send(data);
 	});
 };
+WSS.rooms = {
+	alpha: [],
+	beta: []
+};
 
-WSS.on('connection', ws => {
+WSS.on('connection', wsClient => {
 	console.log(`User connected`);
-	ws.room = [];
-	ws.on('message', message => {
-		console.log('message: ', message);
+	// ws.room = [];
+
+	/* WHEN CLIENT SEND MESSAGE */
+	wsClient.on('message', message => {
+		// console.log('message: ', message);
 		let data;
 		try {
 			data = JSON.parse(message);
@@ -44,8 +50,10 @@ WSS.on('connection', ws => {
 
 		switch (data.type) {
 			case 'join':
-				console.log('User trying to join room');
-				ws.room.push(data.room);
+				console.log(`User[${data.name}] joined room ${data.room}`);
+				wsClient.name = data.name;
+				WSS.rooms[data.room].push(wsClient);
+				console.log(WSS.rooms);
 				break;
 
 			case 'broadcast':
@@ -57,11 +65,18 @@ WSS.on('connection', ws => {
 				break;
 
 			default:
-				sendTo(ws, {
+				sendTo(wsClient, {
 					type: 'error',
 					message: `Command not found: ${data.type}`
 				});
 				break;
+		}
+	});
+
+	/* CLIENT CLOSE BROWSER OR CONNECTION */
+	wsClient.on('close', (code, reason) => {
+		if (wsClient.name) {
+			console.log(`User[${wsClient.name}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
 		}
 	});
 });

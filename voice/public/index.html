@@ -11,6 +11,34 @@
 	<button id="btn">join group</button><br>
 	<input id="text" type="text"/>
 	<span id="out"></span>
+
+	<div class="log-screen">
+		<form onsubmit="return false" name="loginForm">
+			<h2>Login form</h2>
+			<label for="userNameInput">Enter your name:</label>
+			<input type="text" name="userNameInput">
+			<br>
+			<label for="roomChoice">Choose your room:</label>
+			<select name="roomChoice" id="rooms">
+				<option value="alpha">alpha</option>
+				<option value="beta">beta</option>
+			</select>
+			<br>
+			<button name="loginBtn">Log in</button>
+		</form>
+	</div>
+
+	<h4>Status: <span id="connectStatus">not connected</span></h4>
+	<div class="room" style="display: none">
+		<h2 class="room__name">Current room: <span id="currentRoom"></span></h2>
+		<h3 class="room__user">Your name: <span id="userName"></span></h3>
+		<ul class="users-list">
+			<li class="users-list__item"></li>
+		</ul>
+	</div>
+
+
+
 	<script src="./bundle.js"></script>	
 </body>
 </html>
