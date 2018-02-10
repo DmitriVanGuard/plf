@@ -14,6 +14,27 @@ loginForm.loginBtn.onclick = () => {
 	return console.log(`You[${client.name}] joined channel ${loginForm.roomChoice.value}`);
 };
 
+/* ******************** */
+/*  WebSocket Handlers	*/
+/* ******************** */
+
+ws.onmessage = message => {
+	console.log('Got message', message.data);
+	const data = JSON.parse(message.data);
+
+	switch (data.type) {
+		case 'join':
+			console.log(data);
+			break;
+		case 'newUser':
+			console.log(data);
+			break;
+		default:
+			console.log(`Unknown message type ${data.type}`, data);
+			break;
+	}
+};
+
 /*
 	var group = document.getElementById('group').textContent;
 	// const btn = document.querySelector('button');

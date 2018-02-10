@@ -21,10 +21,15 @@ const WSS = new WebSocket.Server({ server });
 function sendTo(connection, message) {
 	connection.send(JSON.stringify(message));
 }
-
-WSS.broadcast = (data, exceptClient = null) => {
-	WSS.clients.forEach(client => {
-		if (client !== exceptClient && client.readyState === WebSocket.OPEN) client.send(data);
+function isNameInUseInChosenRoom(name, room) {
+	return WSS.rooms[room].some(socket => socket.name === name);
+}
+function getChosenRoomUserNames(room) {
+	return WSS.rooms[room].map(socket => socket.name);
+}
+WSS.broadcast = (room, data, exceptClient = null) => {
+	WSS.rooms[room].forEach(client => {
+		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
 	});
 };
 WSS.rooms = {
@@ -50,14 +55,22 @@ WSS.on('connection', wsClient => {
 
 		switch (data.type) {
 			case 'join':
+				if (isNameInUseInChosenRoom(data.name, data.room)) {
+					sendTo(wsClient, { type: 'join', success: false });
+					break;
+				}
 				console.log(`User[${data.name}] joined room ${data.room}`);
+				sendTo(wsClient, { type: 'join', success: true, users: getChosenRoomUserNames(data.room) });
 				wsClient.name = data.name;
+
+				WSS.broadcast(data.room, { type: 'newUser', name: data.name });
+
 				WSS.rooms[data.room].push(wsClient);
 				console.log(WSS.rooms);
 				break;
 
 			case 'broadcast':
-				broadcast(data.room, data.msg);
+				// broadcast(data.room, data.msg);
 				break;
 
 			case 'msg':
