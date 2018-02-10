@@ -21,7 +21,7 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.jsx?$/, // enything that ends with JS or JSX runs through babel
+				test: /\.js/, // enything that ends with JS or JSX runs through babel
 				include: [path.resolve('js')]
 			}
 		]
