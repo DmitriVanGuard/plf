@@ -58,11 +58,8 @@ WSS.on('connection', wsClient => {
 				break;
 
 			case 'leave':
-				const userIndex = WSS.rooms[data.room].indexOf(wsClient);
-				console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
 				WSS.broadcast(data.room, { type: 'leave', name: wsClient.name });
-
-				if (userIndex !== -1) WSS.rooms[data.room].splice(userIndex, 1);
+				deleteUserSocketFromRoomsArray(wsClient, data.room);
 				break;
 
 			default:
@@ -92,6 +89,11 @@ function isNameInUseInChosenRoom(name, room) {
 }
 function getExistingRoomUserNames(room) {
 	return WSS.rooms[room].map(socket => socket.name);
+}
+function deleteUserSocketFromRoomsArray(socket, room) {
+	const userIndex = WSS.rooms[room].indexOf(socket);
+	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
+	if (userIndex !== -1) WSS.rooms[room].splice(userIndex, 1);
 }
 WSS.broadcast = (room, data, exceptClient = null) => {
 	WSS.rooms[room].forEach(client => {
