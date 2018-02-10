@@ -8,13 +8,14 @@
     "watch": "webpack --watch",
     "lint": "eslint **/*.js --quiet",
     "format": "prettier --write --single-quote --use-tabs --tab-width=1 --print-width=120 --parser=flow \"js/**/*.js\"",
-    "start": "NODE_ENV=server node server.js"
+    "dev": "NODE_ENV=server nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "node-static": "^0.7.10",
+    "nodemon": "^1.14.12",
     "webpack": "^3.10.0",
     "ws": "^4.0.0"
   },
