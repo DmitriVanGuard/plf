@@ -1,10 +1,14 @@
 import Client from './client';
-// import WSHandlers from './WSHandlers';
 
-const ws = new WebSocket('ws://localhost:8000');
-const client = new Client(ws);
-// const wsHandlers = new WSHandlers(ws);
+const client = new Client('ws://localhost:8000');
 const { loginForm } = document.forms;
+
+// ///////////////////////
+// DOM ELEMENTS
+// ///////////////////////
+const currentRoomNode = document.getElementById('currentRoom');
+const userNameNode = document.getElementById('userName');
+const usersListNode = document.getElementById('usersList');
 
 loginForm.loginBtn.onclick = () => {
 	if (loginForm.userNameInput.value === '') return alert('Please, enter your name');
@@ -15,47 +19,9 @@ loginForm.loginBtn.onclick = () => {
 	return console.log(`You[${client.name}] joined channel ${loginForm.roomChoice.value}`);
 };
 
-/* ******************** */
-/*  WebSocket Handlers	*/
-/* ******************** */
-
-ws.onmessage = message => {
-	console.log('Got message', message.data);
-	const data = JSON.parse(message.data);
-
-	switch (data.type) {
-		case 'join':
-			console.log(data);
-			handleJoin(data);
-			break;
-		case 'newUser':
-			updateUsersList(data.name);
-			console.log(data);
-			break;
-		default:
-			console.log(`Unknown message type ${data.type}`, data);
-			break;
-	}
-};
-
-/* ******************** */
-/*	DOM ELEMENTS				*/
-/* ******************** */
-const currentRoomNode = document.getElementById('currentRoom');
-const userNameNode = document.getElementById('userName');
-const usersListNode = document.getElementById('usersList');
-
-function handleJoin(data) {
-	if (data.success === false) return alert('Пожалуйста, выберите другое имя');
-
-	currentRoomNode.textContent = client.room;
-	userNameNode.textContent = client.name;
-
-	updateUsersList(data.users);
-
-	return console.log('Login successful');
-}
-
+// ////////////////////////////
+// WebSocket Handlers Callbacks
+// ////////////////////////////
 function updateUsersList(users) {
 	const arrayOfUserNames = Array.isArray(users);
 	let nodeToAppend = null;
@@ -87,42 +53,14 @@ function updateUsersList(users) {
 	return usersListNode.appendChild(nodeToAppend);
 }
 
-/*
-	var group = document.getElementById('group').textContent;
-	// const btn = document.querySelector('button');
-	btn.onclick = bjoin;
-	// console.log(btn);
+client.onJoinRoom(data => {
+	if (data.success === false) return alert('Пожалуйста, выберите другое имя');
 
-	// var ws = new WebSocket('ws://localhost:8000');
-	ws.onerror = function(e) {
-		out.innerHTML = e;
-	};
-	ws.onclose = function(e) {
-		out.innerHTML = 'closed' + e;
-	};
-	ws.onopen = function() {
-		out.innerHTML = 'connected ';
-	};
-	ws.onmessage = function(ms) {
-		out.innerHTML += ms.data + '<br>';
-	};
-	function send(msg) {
-		ws.send(JSON.stringify({ msg: msg }));
-	}
-	function broadcast(msg, room) {
-		ws.send(JSON.stringify({ type: 'broadcast', room, msg }));
-	}
-	function join(room) {
-		ws.send(JSON.stringify({ type: 'join', room }));
-	}
-	function bjoin() {
-		//alert(group);
-		join(group);
-		btn.textContent = 'Connected';
-		btn.disabled = true;
-	}
-	text.onchange = function(el) {
-		//alert(el.target.value);
-		broadcast(el.target.value, group);
-	};
-	*/
+	currentRoomNode.textContent = client.room;
+	userNameNode.textContent = client.name;
+
+	loginForm.loginBtn.disabled = true;
+	updateUsersList(data.users);
+	return console.log('Login successful');
+});
+client.onNewUser(data => updateUsersList(data.name));

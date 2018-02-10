@@ -21,20 +21,6 @@ console.log(chalk.yellow('Server is running on port -> ') + chalk.bgGreen(chalk.
 
 const WSS = new WebSocket.Server({ server });
 
-function sendTo(connection, message) {
-	connection.send(JSON.stringify(message));
-}
-function isNameInUseInChosenRoom(name, room) {
-	return WSS.rooms[room].some(socket => socket.name === name);
-}
-function getChosenRoomUserNames(room) {
-	return WSS.rooms[room].map(socket => socket.name);
-}
-WSS.broadcast = (room, data, exceptClient = null) => {
-	WSS.rooms[room].forEach(client => {
-		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
-	});
-};
 WSS.rooms = {
 	alpha: [],
 	beta: []
@@ -62,13 +48,14 @@ WSS.on('connection', wsClient => {
 					break;
 				}
 				console.log(`User[${data.name}] joined room ${data.room}`);
-				sendTo(wsClient, { type: 'join', success: true, users: getChosenRoomUserNames(data.room) });
+				sendTo(wsClient, { type: 'join', success: true, users: getExistingRoomUserNames(data.room) });
 				wsClient.name = data.name;
+				wsClient.id = generateUserIDinRoom(data.room);
 
 				WSS.broadcast(data.room, { type: 'newUser', name: data.name });
 
 				WSS.rooms[data.room].push(wsClient);
-				console.log(WSS.rooms);
+				// console.log(WSS.rooms);
 				break;
 
 			case 'broadcast':
@@ -97,6 +84,24 @@ WSS.on('connection', wsClient => {
 
 	wsClient.on('error', () => console.log(chalk.red(`Some error after closing browsers`)));
 });
+
+function sendTo(connection, message) {
+	connection.send(JSON.stringify(message));
+}
+function isNameInUseInChosenRoom(name, room) {
+	return WSS.rooms[room].some(socket => socket.name === name);
+}
+function getExistingRoomUserNames(room) {
+	return WSS.rooms[room].map(socket => socket.name);
+}
+function generateUserIDinRoom(room) {
+	return WSS.rooms[room].length;
+}
+WSS.broadcast = (room, data, exceptClient = null) => {
+	WSS.rooms[room].forEach(client => {
+		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
+	});
+};
 
 /*function broadcast(room, message) {
 	console.log(`Broadcasting message [${message}] to the room -> ${room}.`);
