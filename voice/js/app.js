@@ -3,6 +3,7 @@ import Room from './Room';
 
 const client = new Client('ws://localhost:8000');
 const room = new Room();
+
 // ////////////////////////////
 // Control Form Event Handlers
 // ////////////////////////////
@@ -60,3 +61,10 @@ client.onRemoteAudio((stream, fromUser) => {
 	const item = room.usersList.querySelector(`li[data-name="${fromUser}"]`);
 	item.lastElementChild.srcObject = stream;
 });
+
+// /////////////////////////////
+// HELPER FUNCTIONS
+// /////////////////////////////
+function htmlentities(str) {
+	return str.replace(/[\u00A0-\u9999<>&]/gim, i => `&#${i.charCodeAt(0)};`);
+}

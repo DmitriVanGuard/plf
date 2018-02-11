@@ -31,15 +31,12 @@ WSS.on('connection', wsClient => {
 
 	/* WHEN CLIENT SEND MESSAGE */
 	wsClient.on('message', message => {
-		// console.log('message: ', message);
 		let data;
 		try {
 			data = JSON.parse(message);
 		} catch (e) {
-			// console.log(e);
 			data = {};
 		}
-		// console.log(data);
 
 		switch (data.type) {
 			case 'join':
@@ -54,7 +51,6 @@ WSS.on('connection', wsClient => {
 				WSS.broadcast(data.room, { type: 'newUser', name: data.name });
 
 				WSS.rooms[data.room].push(wsClient);
-				// console.log(WSS.rooms);
 				break;
 
 			case 'leave':
@@ -110,6 +106,14 @@ WSS.on('connection', wsClient => {
 	wsClient.on('error', () => console.log(chalk.red(`Some error after closing browsers`)));
 });
 
+// ///////////////////////////
+// HELPER FUNCTIONS
+// ///////////////////////////
+WSS.broadcast = (room, data, exceptClient = null) => {
+	WSS.rooms[room].forEach(client => {
+		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
+	});
+};
 function sendTo(connection, message) {
 	connection.send(JSON.stringify(message));
 }
@@ -124,17 +128,5 @@ function deleteUserSocketFromRoomsArray(socket, room) {
 	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
 	if (userIndex !== -1) WSS.rooms[room].splice(userIndex, 1);
 }
-WSS.broadcast = (room, data, exceptClient = null) => {
-	WSS.rooms[room].forEach(client => {
-		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
-	});
-};
 
-/*function broadcast(room, message) {
-	console.log(`Broadcasting message [${message}] to the room -> ${room}.`);
-	WSS.clients.forEach(client => {
-		if (client.room.indexOf(room) > -1) {
-			client.send(message);
-		}
-	});
-}*/
+

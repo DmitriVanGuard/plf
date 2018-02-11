@@ -20,6 +20,10 @@ export default class Client {
 
 		this.initSignalingChannelHandlers();
 	}
+
+	// ///////////////////////////
+	// PUBLIC METHODS
+	// ///////////////////////////
 	sendJSONToServer(data) {
 		this.ws.send(JSON.stringify(data));
 	}
@@ -69,6 +73,10 @@ export default class Client {
 		this._onRemoteAudioCallback = callback;
 	}
 
+	addRemoteAudio(stream, fromUser) {
+		this._onRemoteAudioCallback(stream, fromUser);
+	}
+
 	// ///////////////////////////
 	// SETUP/INIT METHODS
 	// ///////////////////////////
@@ -91,12 +99,10 @@ export default class Client {
 					this.createAnswer(data.offer, data.from);
 					break;
 				case 'answer':
-					console.log(`Got answer from ${data.from}`);
 					this.setRemoteDescription(data.answer, data.from);
 					break;
 				case 'candidate':
-					console.log('CAndidate message');
-					this.handleCandidate(data);
+					this.addCandidate(data);
 					break;
 				default:
 					console.log(`Unknown message type ${data.type}`, data);
@@ -104,6 +110,7 @@ export default class Client {
 			}
 		};
 	}
+
 	// ///////////////////////////
 	// COMMUNICATION METHODS
 	// ///////////////////////////
@@ -111,7 +118,7 @@ export default class Client {
 		for (let i = 0; i < users.length; i++) {
 			console.log(`Creating offer for ${users[i]}`);
 			this.PC[users[i]] = new RTCPeerConnection(this.pcConfig);
-			this.PC[users[i]].onicecandidate = this.handleIceCandidateAnswerWrapper(users[i]);
+			this.PC[users[i]].onicecandidate = this.handleIceCandidateNegotiation(users[i]);
 			this.PC[users[i]].onaddstream = this.handleRemoteTrackAdded(users[i]);
 			this.PC[users[i]].onremovestream = this.handleRemoteStreamRemoved;
 			this.PC[users[i]].addStream(this.localStream);
@@ -135,7 +142,7 @@ export default class Client {
 	createAnswer(offer, fromUser) {
 		console.log(`Creating answer for ${fromUser}`);
 		this.PC[fromUser] = new RTCPeerConnection(this.pcConfig);
-		this.PC[fromUser].onicecandidate = this.handleIceCandidateAnswerWrapper(fromUser);
+		this.PC[fromUser].onicecandidate = this.handleIceCandidateNegotiation(fromUser);
 		this.PC[fromUser].onaddstream = this.handleRemoteTrackAdded(fromUser);
 		this.PC[fromUser].onremovestream = this.handleRemoteStreamRemoved;
 		this.PC[fromUser].addStream(this.localStream);
@@ -161,16 +168,21 @@ export default class Client {
 		this.PC[fromUser].setRemoteDescription(new RTCSessionDescription(answer));
 	}
 
+	addCandidate(data) {
+		console.log(`Ice candidate data`, data);
+		this.PC[data.fromUser].addIceCandidate(new RTCIceCandidate(data.candidate));
+	}
+
 	// ///////////////////////////
 	// HANDLERS
 	// ///////////////////////////
 	handleUserMedia(stream) {
-		console.log('Adding local stream');
+		// console.log('Adding local stream');
 		this.localStream = stream;
 		this._onLocalAudioCallback(stream);
 	}
 
-	handleIceCandidateAnswerWrapper(toUser) {
+	handleIceCandidateNegotiation(toUser) {
 		return event => {
 			if (event.candidate) {
 				this.sendJSONToServer({
@@ -183,11 +195,6 @@ export default class Client {
 		};
 	}
 
-	handleCandidate(data) {
-		console.log(`Ice candidate data`, data);
-		this.PC[data.fromUser].addIceCandidate(new RTCIceCandidate(data.candidate));
-	}
-
 	handleRemoteTrackAdded(from) {
 		console.log('Track added event');
 		return event => {
@@ -196,6 +203,7 @@ export default class Client {
 			this.remoteStream = event.stream;
 		};
 	}
+
 	handleRemoteStreamRemoved(event) {
 		console.log('Remote streem removed. Event:', event);
 	}
@@ -210,7 +218,4 @@ export default class Client {
 	}
 
 	// Check this function
-	addRemoteAudio(stream, fromUser) {
-		this._onRemoteAudioCallback(stream, fromUser);
-	}
 }
