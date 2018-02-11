@@ -110,8 +110,10 @@ export default class Client {
 					this.sendJSONToServer({
 						type: 'offer',
 						room: this.room,
+						toUserIndex: i,
 						offer
 					});
+					create;
 					this.PC[users[i]].setLocalDescription(offer);
 				})
 				.catch(this.handleCreateOfferError);
