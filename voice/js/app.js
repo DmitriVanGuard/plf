@@ -30,6 +30,7 @@ client.onJoinRoom(data => {
 	client.onLocalAudio(stream => {
 		room.localAudio.srcObject = stream;
 	});
+	client.createOffers(data.users);
 
 	room.currentRoom.textContent = client.room;
 	room.userName.textContent = client.name;

@@ -11,7 +11,7 @@ export default class Client {
 
 		// WebRTC vars
 		this.mediaConstraints = { video: false, audio: true };
-		this.pcIceConfig = { iceServers: [{ url: 'stun:stun2.1.google.com:19302' }] };
+		this.pcConfig = { iceServers: [{ url: 'stun:stun2.1.google.com:19302' }] };
 		this.PC = {};
 		this.localStream = null;
 		this._onLocalAudioCallback = null;
@@ -94,6 +94,17 @@ export default class Client {
 	// ///////////////////////////
 	// COMMUNICATION METHODS
 	// ///////////////////////////
+	createOffers(users) {
+		for (let i = 0; i < users.length; i++) {
+			this.PC[users[i]] = new RTCPeerConnection(this.pcConfig);
+			// this.PC[users[i]].onicecandidate = this.handleIceCandidateAnswerWrapper();
+			// this.PC[users[i]].ontrack = handleRemoteTrackAdded(users[i]);
+			// this.PC[users[i]].onremovestream = handleRemoteStreamRemoved;
+			this.PC[users[i]].createOffer(offer => {
+				this.PC[users[i]].setLocalDescription(offer);
+			}, this.handleCreateOfferError);
+		}
+	}
 
 	// ///////////////////////////
 	// HANDLERS
@@ -106,5 +117,8 @@ export default class Client {
 	}
 	handleUserMediaError(error) {
 		console.log('getUserMedia error:', error);
+	}
+	handleCreateOfferError(error) {
+		console.log('createOffer() error:', error);
 	}
 }
