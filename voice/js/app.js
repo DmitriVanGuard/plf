@@ -3,7 +3,6 @@ import Room from './Room';
 
 const client = new Client('ws://localhost:8000');
 const room = new Room();
-client.getUserMedia();
 // ////////////////////////////
 // Control Form Event Handlers
 // ////////////////////////////
@@ -27,7 +26,10 @@ room.controlForm.logoutBtn.onclick = () => {
 client.onJoinRoom(data => {
 	if (data.success === false) return alert('Пожалуйста, выберите другое имя');
 
-	//client.getUserMedia();
+	client.getUserMedia();
+	client.onLocalAudio(stream => {
+		room.localAudio.srcObject = stream;
+	});
 
 	room.currentRoom.textContent = client.room;
 	room.userName.textContent = client.name;

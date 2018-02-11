@@ -74,7 +74,7 @@ WSS.on('connection', wsClient => {
 	/* CLIENT CLOSE BROWSER OR CONNECTION */
 	wsClient.on('close', (code, reason) => {
 		if (wsClient.name) {
-			console.log(`User[${wsClient.name}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
+			console.log(`User[${chalk.red(wsClient.name)}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
 		}
 	});
 

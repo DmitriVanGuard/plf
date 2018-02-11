@@ -4,6 +4,7 @@ export default class Room {
 		this.currentRoom = document.getElementById('currentRoom');
 		this.userName = document.getElementById('userName');
 		this.usersList = document.getElementById('usersList');
+		this.localAudio = document.getElementById('localAudio');
 	}
 
 	updateUsersList(usernames) {

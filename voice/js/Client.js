@@ -13,8 +13,9 @@ export default class Client {
 		this.mediaConstraints = { video: false, audio: true };
 		this.pcIceConfig = { iceServers: [{ url: 'stun:stun2.1.google.com:19302' }] };
 		this.PC = {};
-		this._onLocalVideoCallback = null;
-		this._onRemoteVideoCallback = null;
+		this.localStream = null;
+		this._onLocalAudioCallback = null;
+		this._onRemoteAudioCallback = null;
 
 		this.initSignalingChannelHandlers();
 	}
@@ -55,12 +56,21 @@ export default class Client {
 		this._onNewUserCallback = callback;
 	}
 
-	getUserMedia(constraints, success, error) {}
+	getUserMedia() {
+		navigator.getUserMedia(this.mediaConstraints, stream => this.handleUserMedia(stream), this.handleUserMediaError);
+	}
+
+	onLocalAudio(callback) {
+		this._onLocalAudioCallback = callback;
+	}
 
 	// ///////////////////////////
 	// SETUP/INIT METHODS
 	// ///////////////////////////
 	initSignalingChannelHandlers() {
+		window.onbeforeunload = () => {
+			this.leaveRoom();
+		};
 		this.ws.onmessage = message => {
 			console.log('Got message', message.data);
 			const data = JSON.parse(message.data);
@@ -84,4 +94,17 @@ export default class Client {
 	// ///////////////////////////
 	// COMMUNICATION METHODS
 	// ///////////////////////////
+
+	// ///////////////////////////
+	// HANDLERS
+	// ///////////////////////////
+	handleUserMedia(stream) {
+		console.log('Adding local stream');
+		// console.log(this);
+		this._onLocalAudioCallback(stream);
+		this.localStream = stream;
+	}
+	handleUserMediaError(error) {
+		console.log('getUserMedia error:', error);
+	}
 }
