@@ -57,5 +57,6 @@ client.onLeave(data => {
 
 client.onRemoteAudio((stream, fromUser) => {
 	console.log('Adding remote audio from user', fromUser);
-	room.usersList.document.querySelector(`audio[${fromUser}]`).srcObject = stream;
+	const item = room.usersList.querySelector(`li[data-name="${fromUser}"]`);
+	item.lastElementChild.srcObject = stream;
 });

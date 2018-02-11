@@ -1,4 +1,4 @@
-// require('webrtc-adapter');
+require('webrtc-adapter');
 
 export default class Client {
 	constructor(host) {
@@ -74,7 +74,7 @@ export default class Client {
 	// ///////////////////////////
 	initSignalingChannelHandlers() {
 		this.ws.onmessage = message => {
-			console.log('Got message', message.data);
+			// console.log('Got message', message.data);
 			const data = JSON.parse(message.data);
 
 			switch (data.type) {
@@ -112,7 +112,7 @@ export default class Client {
 			console.log(`Creating offer for ${users[i]}`);
 			this.PC[users[i]] = new RTCPeerConnection(this.pcConfig);
 			this.PC[users[i]].onicecandidate = this.handleIceCandidateAnswerWrapper(users[i]);
-			this.PC[users[i]].onstream = this.handleRemoteTrackAdded(users[i]);
+			this.PC[users[i]].onaddstream = this.handleRemoteTrackAdded(users[i]);
 			this.PC[users[i]].onremovestream = this.handleRemoteStreamRemoved;
 			this.PC[users[i]].addStream(this.localStream);
 
@@ -136,7 +136,7 @@ export default class Client {
 		console.log(`Creating answer for ${fromUser}`);
 		this.PC[fromUser] = new RTCPeerConnection(this.pcConfig);
 		this.PC[fromUser].onicecandidate = this.handleIceCandidateAnswerWrapper(fromUser);
-		this.PC[fromUser].onstream = this.handleRemoteTrackAdded(fromUser);
+		this.PC[fromUser].onaddstream = this.handleRemoteTrackAdded(fromUser);
 		this.PC[fromUser].onremovestream = this.handleRemoteStreamRemoved;
 		this.PC[fromUser].addStream(this.localStream);
 
