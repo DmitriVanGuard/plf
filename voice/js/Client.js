@@ -85,6 +85,9 @@ export default class Client {
 				case 'offer':
 					this.createAnswer(data.offer, data.from);
 					break;
+				case 'answer':
+					console.log(`Got answer from ${data.from}`);
+					break;
 				default:
 					console.log(`Unknown message type ${data.type}`, data);
 					break;
@@ -126,6 +129,12 @@ export default class Client {
 		this.PC[fromUser]
 			.createAnswer()
 			.then(answer => {
+				this.sendJSONToServer({
+					type: 'answer',
+					room: this.room,
+					toUser: fromUser,
+					answer
+				});
 				this.PC[fromUser].setLocalDescription(answer);
 			})
 			.catch(this.handleCreateAnswerError);

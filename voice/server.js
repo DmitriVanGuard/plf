@@ -67,6 +67,16 @@ WSS.on('connection', wsClient => {
 				WSS.broadcast(data.room, { type: 'offer', offer: data.offer, from: wsClient.name }, wsClient);
 				break;
 
+			case 'answer':
+				console.log(`${chalk.greenBright(wsClient.name)} wants to send an ${chalk.greenBright('answer')} to ${chalk.greenBright(data.toUser)} in room ${chalk.greenBright(data.room)}`); // prettier-ignore
+				for (let i = WSS.rooms[data.room].length - 1; i !== -1; i--) {
+					if (WSS.rooms[data.room][i].name === data.toUser) {
+						sendTo(WSS.rooms[data.room][i], { type: 'answer', answer: data.answer, from: wsClient.name });
+						break;
+					}
+				}
+				break;
+
 			default:
 				sendTo(wsClient, {
 					type: 'error',
