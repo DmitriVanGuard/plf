@@ -63,10 +63,8 @@ WSS.on('connection', wsClient => {
 				break;
 
 			case 'offer':
-				console.log(`${chalk.magenta(wsClient.name)} wants to send an ${chalk.magenta('offer')} to ${chalk.magenta(
-					'everyone'
-				)} in room ${chalk.magenta(data.room)}
-					  `);
+				console.log(`${chalk.magenta(wsClient.name)} wants to send an ${chalk.magenta('offer')} to ${chalk.magenta('everyone')} in room ${chalk.magenta(data.room)}`); // prettier-ignore
+				WSS.broadcast(data.room, { type: 'offer', offer: data.offer, from: wsClient.name }, wsClient);
 				break;
 
 			default:

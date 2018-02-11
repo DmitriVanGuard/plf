@@ -82,6 +82,9 @@ export default class Client {
 				case 'leave':
 					this._onLeaveCallback(data);
 					break;
+				case 'offer':
+					this.createAnswer(data.offer, data.from);
+					break;
 				default:
 					console.log(`Unknown message type ${data.type}`, data);
 					break;
@@ -112,6 +115,22 @@ export default class Client {
 		}
 	}
 
+	createAnswer(offer, fromUser) {
+		console.log(`Creating answer for ${fromUser}`);
+		this.PC[fromUser] = new RTCPeerConnection(this.pcConfig);
+		// this.PC[users[i]].onicecandidate = this.handleIceCandidateAnswerWrapper();
+		// this.PC[users[i]].ontrack = handleRemoteTrackAdded(users[i]);
+		// this.PC[users[i]].onremovestream = handleRemoteStreamRemoved;
+		this.PC[fromUser].setRemoteDescription(new RTCSessionDescription(offer));
+
+		this.PC[fromUser]
+			.createAnswer()
+			.then(answer => {
+				this.PC[fromUser].setLocalDescription(answer);
+			})
+			.catch(this.handleCreateAnswerError);
+	}
+
 	// ///////////////////////////
 	// HANDLERS
 	// ///////////////////////////
@@ -126,5 +145,8 @@ export default class Client {
 	}
 	handleCreateOfferError(error) {
 		console.log('createOffer() error:', error);
+	}
+	handleCreateAnswerError(error) {
+		console.log('createAnswer() error:', error);
 	}
 }
