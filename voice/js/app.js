@@ -26,11 +26,14 @@ room.controlForm.logoutBtn.onclick = () => {
 client.onJoinRoom(data => {
 	if (data.success === false) return alert('Пожалуйста, выберите другое имя');
 
+	window.onbeforeunload = () => {
+		client.leaveRoom();
+	};
 	client.getUserMedia();
 	client.onLocalAudio(stream => {
 		room.localAudio.srcObject = stream;
+		client.createOffers(data.users);
 	});
-	client.createOffers(data.users);
 
 	room.currentRoom.textContent = client.room;
 	room.userName.textContent = client.name;

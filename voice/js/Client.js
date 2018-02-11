@@ -68,9 +68,6 @@ export default class Client {
 	// SETUP/INIT METHODS
 	// ///////////////////////////
 	initSignalingChannelHandlers() {
-		window.onbeforeunload = () => {
-			this.leaveRoom();
-		};
 		this.ws.onmessage = message => {
 			console.log('Got message', message.data);
 			const data = JSON.parse(message.data);
@@ -96,13 +93,22 @@ export default class Client {
 	// ///////////////////////////
 	createOffers(users) {
 		for (let i = 0; i < users.length; i++) {
+			console.log(`Creating offer for ${users[i]}`);
 			this.PC[users[i]] = new RTCPeerConnection(this.pcConfig);
 			// this.PC[users[i]].onicecandidate = this.handleIceCandidateAnswerWrapper();
 			// this.PC[users[i]].ontrack = handleRemoteTrackAdded(users[i]);
 			// this.PC[users[i]].onremovestream = handleRemoteStreamRemoved;
-			this.PC[users[i]].createOffer(offer => {
-				this.PC[users[i]].setLocalDescription(offer);
-			}, this.handleCreateOfferError);
+			this.PC[users[i]]
+				.createOffer()
+				.then(offer => {
+					this.sendJSONToServer({
+						type: 'offer',
+						room: this.room,
+						offer
+					});
+					this.PC[users[i]].setLocalDescription(offer);
+				})
+				.catch(this.handleCreateOfferError);
 		}
 	}
 

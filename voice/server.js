@@ -62,6 +62,13 @@ WSS.on('connection', wsClient => {
 				deleteUserSocketFromRoomsArray(wsClient, data.room);
 				break;
 
+			case 'offer':
+				console.log(`${chalk.magenta(wsClient.name)} wants to send an ${chalk.magenta('offer')} to ${chalk.magenta(
+					'everyone'
+				)} in room ${chalk.magenta(data.room)}
+					  `);
+				break;
+
 			default:
 				sendTo(wsClient, {
 					type: 'error',
