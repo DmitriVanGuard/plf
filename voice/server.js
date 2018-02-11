@@ -77,6 +77,20 @@ WSS.on('connection', wsClient => {
 				}
 				break;
 
+			case 'candidate':
+				console.log(`${chalk.cyanBright(wsClient.name)} wants to send an ${chalk.cyanBright('candidate')} to ${chalk.cyanBright(data.toUser)} in room ${chalk.cyanBright(data.room)}`); // prettier-ignore
+				WSS.rooms[data.room].some(socket => {
+					if (socket.name === data.toUser) {
+						sendTo(socket, {
+							type: 'candidate',
+							fromUser: wsClient.name,
+							candidate: data.candidate
+						});
+					}
+					return false;
+				});
+				break;
+
 			default:
 				sendTo(wsClient, {
 					type: 'error',
