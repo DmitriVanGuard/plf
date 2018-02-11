@@ -27,13 +27,13 @@ room.controlForm.logoutBtn.onclick = () => {
 client.onJoinRoom(data => {
 	if (data.success === false) return alert('Пожалуйста, выберите другое имя');
 
+	//client.getUserMedia();
+
 	room.currentRoom.textContent = client.room;
 	room.userName.textContent = client.name;
 
-	room.controlForm.userNameInput.disabled = true;
-	room.controlForm.loginBtn.disabled = true;
-	room.controlForm.roomChoice.disabled = true;
-	room.controlForm.logoutBtn.disabled = false;
+	room.switchControlsDisableState(true);
+
 	room.updateUsersList(data.users);
 	return console.log('Login successful');
 });
@@ -44,9 +44,6 @@ client.onLeave(data => {
 	if (client.name !== data.name) {
 		room.removeUserFromUsersList(data.name);
 	} else {
-		room.controlForm.userNameInput.disabled = false;
-		room.controlForm.roomChoice.disabled = false;
-		room.controlForm.loginBtn.disabled = false;
-		room.controlForm.logoutBtn.disabled = true;
+		room.switchControlsDisableState(false);
 	}
 });

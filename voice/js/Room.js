@@ -51,4 +51,12 @@ export default class Room {
 		item.appendChild(audio);
 		return item;
 	}
+
+	/* When logout is disabled, all others are enabled and vice versa */
+	switchControlsDisableState(state) {
+		this.controlForm.userNameInput.disabled = state;
+		this.controlForm.loginBtn.disabled = state;
+		this.controlForm.roomChoice.disabled = state;
+		this.controlForm.logoutBtn.disabled = !state;
+	}
 }
