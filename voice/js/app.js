@@ -47,5 +47,6 @@ client.onLeave(data => {
 		room.removeUserFromUsersList(data.name);
 	} else {
 		room.switchControlsDisableState(false);
+		room.localAudio.srcObject = null;
 	}
 });
