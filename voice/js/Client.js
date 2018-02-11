@@ -1,3 +1,5 @@
+require('webrtc-adapter');
+
 export default class Client {
 	constructor(host) {
 		this.ws = new WebSocket(host);
@@ -6,6 +8,13 @@ export default class Client {
 		this._onJoinRoomCallback = null;
 		this._onLeaveCallback = null;
 		this._onNewUserCallback = null;
+
+		// WebRTC vars
+		this.mediaConstraints = { video: false, audio: true };
+		this.pcIceConfig = { iceServers: [{ url: 'stun:stun2.1.google.com:19302' }] };
+		this.PC = {};
+		this._onLocalVideoCallback = null;
+		this._onRemoteVideoCallback = null;
 
 		this.initSignalingChannelHandlers();
 	}
@@ -45,6 +54,8 @@ export default class Client {
 	onNewUser(callback) {
 		this._onNewUserCallback = callback;
 	}
+
+	getUserMedia(constraints, success, error) {}
 
 	// ///////////////////////////
 	// SETUP/INIT METHODS

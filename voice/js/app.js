@@ -3,7 +3,7 @@ import Room from './Room';
 
 const client = new Client('ws://localhost:8000');
 const room = new Room();
-
+client.getUserMedia();
 // ////////////////////////////
 // Control Form Event Handlers
 // ////////////////////////////
