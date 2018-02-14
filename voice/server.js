@@ -9,6 +9,7 @@ const file = new staticNode.Server('./public');
 
 const server = http
 	.createServer((request, response) => {
+		console.log(`${new Date()} user enters the site`);
 		request
 			.addListener('end', () => {
 				file.serve(request, response);
@@ -99,6 +100,7 @@ WSS.on('connection', wsClient => {
 	/* CLIENT CLOSE BROWSER OR CONNECTION */
 	wsClient.on('close', (code, reason) => {
 		if (wsClient.name) {
+			// deleteUserSocketFromRoomsArray(); TODO: DELETE USER
 			console.log(`User[${chalk.red(wsClient.name)}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
 		}
 	});

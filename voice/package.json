@@ -14,7 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-preset-env": "^1.6.1",
     "chalk": "^2.3.0",
+    "ngrok": "^2.2.26",
     "node-static": "^0.7.10",
     "nodemon": "^1.14.12",
     "webpack": "^3.10.0",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",
+    "babel-loader": "^7.1.2",
     "eslint": "^4.17.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-prettier": "^2.9.0",

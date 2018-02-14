@@ -22,6 +22,7 @@ const config = {
 		rules: [
 			{
 				test: /\.js/, // enything that ends with JS or JSX runs through babel
+				loader: 'babel-loader',
 				include: [path.resolve('js')]
 			}
 		]

@@ -1,7 +1,7 @@
 import Client from './Client';
 import Room from './Room';
 
-const client = new Client('ws://localhost:8000');
+const client = new Client('wss://4f63cfec.eu.ngrok.io');
 const room = new Room();
 
 // ////////////////////////////
@@ -17,6 +17,23 @@ room.controlForm.loginBtn.onclick = () => {
 };
 
 room.controlForm.logoutBtn.onclick = () => {
+	client.leaveRoom();
+	room.cleanRoom();
+};
+room.controlForm.loginBtn.ontouchstart = () => {
+	if (room.controlForm.userNameInput.value === '') return alert('Please, enter your name');
+
+	client.name = room.controlForm.userNameInput.value;
+	client.joinRoom(room.controlForm.roomChoice.value);
+
+	return console.log(`You[${client.name}] joined channel ${room.controlForm.roomChoice.value}`);
+};
+
+room.controlForm.logoutBtn.onclick = () => {
+	client.leaveRoom();
+	room.cleanRoom();
+};
+room.controlForm.logoutBtn.ontouchstart = () => {
 	client.leaveRoom();
 	room.cleanRoom();
 };
@@ -65,6 +82,3 @@ client.onRemoteAudio((stream, fromUser) => {
 // /////////////////////////////
 // HELPER FUNCTIONS
 // /////////////////////////////
-function htmlentities(str) {
-	return str.replace(/[\u00A0-\u9999<>&]/gim, i => `&#${i.charCodeAt(0)};`);
-}
