@@ -11,7 +11,44 @@ export default class Client {
 
 		// WebRTC vars
 		this.mediaConstraints = { video: false, audio: true };
-		this.pcConfig = { iceServers: [{ url: 'stun:stun2.1.google.com:19302' }] };
+		this.pcConfig = {
+			iceServers: [
+				{ url: 'stun:stun01.sipphone.com' },
+				{ url: 'stun:stun.ekiga.net' },
+				{ url: 'stun:stun.fwdnet.net' },
+				{ url: 'stun:stun.ideasip.com' },
+				{ url: 'stun:stun.iptel.org' },
+				{ url: 'stun:stun.rixtelecom.se' },
+				{ url: 'stun:stun.schlund.de' },
+				{ url: 'stun:stun.l.google.com:19302' },
+				{ url: 'stun:stun1.l.google.com:19302' },
+				{ url: 'stun:stun2.l.google.com:19302' },
+				{ url: 'stun:stun3.l.google.com:19302' },
+				{ url: 'stun:stun4.l.google.com:19302' },
+				{ url: 'stun:stunserver.org' },
+				{ url: 'stun:stun.softjoys.com' },
+				{ url: 'stun:stun.voiparound.com' },
+				{ url: 'stun:stun.voipbuster.com' },
+				{ url: 'stun:stun.voipstunt.com' },
+				{ url: 'stun:stun.voxgratia.org' },
+				{ url: 'stun:stun.xten.com' },
+				{
+					url: 'turn:numb.viagenie.ca',
+					credential: 'muazkh',
+					username: 'webrtc@live.com'
+				},
+				{
+					url: 'turn:192.158.29.39:3478?transport=udp',
+					credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+					username: '28224511:1379330808'
+				},
+				{
+					url: 'turn:192.158.29.39:3478?transport=tcp',
+					credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+					username: '28224511:1379330808'
+				}
+			]
+		};
 		this.PC = {};
 		this.localStream = null;
 		this.remoteStream = null;
@@ -122,6 +159,11 @@ export default class Client {
 			this.PC[users[i]].onaddstream = this.handleRemoteTrackAdded(users[i]);
 			this.PC[users[i]].onremovestream = this.handleRemoteStreamRemoved;
 			this.PC[users[i]].addStream(this.localStream);
+			this.PC[users[i]].oniceconnectionstatechange = err => {
+				if (this.PC[users[i]].iceConnectionState === 'failed') {
+					console.log(err);
+				}
+			};
 
 			this.PC[users[i]]
 				.createOffer()
@@ -145,6 +187,11 @@ export default class Client {
 		this.PC[fromUser].onicecandidate = this.handleIceCandidateNegotiation(fromUser);
 		this.PC[fromUser].onaddstream = this.handleRemoteTrackAdded(fromUser);
 		this.PC[fromUser].onremovestream = this.handleRemoteStreamRemoved;
+		this.PC[fromUser].oniceconnectionstatechange = err => {
+			if (this.PC[fromUser].iceConnectionState === 'failed') {
+				console.log(err);
+			}
+		};
 		this.PC[fromUser].addStream(this.localStream);
 
 		this.PC[fromUser].setRemoteDescription(new RTCSessionDescription(offer));
