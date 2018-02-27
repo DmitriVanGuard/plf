@@ -168,7 +168,6 @@ WSS.on('connection', wsClient => {
 		if (wsClient.name) {
 			WSS.broadcast(wsClient.room, { type: 'leave', name: wsClient.name });
 			deleteUserSocketFromRoomsArray(wsClient, wsClient.room);
-			console.log(chalk.red(`Some error after closing browsers`));
 		}
 	});
 });
