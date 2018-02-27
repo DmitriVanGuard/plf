@@ -8,7 +8,8 @@
     "watch": "webpack --watch",
     "lint": "eslint **/*.js --quiet",
     "format": "prettier --write --single-quote --use-tabs --tab-width=1 --print-width=120 --parser=flow \"js/**/*.js\"",
-    "dev": "NODE_ENV=server nodemon server.js"
+    "serv": "NODE_ENV=server nodemon server.js",
+    "dep": "ngrok http -region=eu 8000"
   },
   "keywords": [],
   "author": "",

@@ -1,7 +1,7 @@
 import Client from './Client';
 import Room from './Room';
 
-const client = new Client('wss://757b6961.eu.ngrok.io');
+const client = new Client('wss://be2aab8a.eu.ngrok.io');
 const room = new Room();
 
 // ////////////////////////////

@@ -110,6 +110,7 @@ WSS.on('connection', wsClient => {
 
 			case 'leave':
 				WSS.broadcast(wsClient.room, { type: 'leave', name: wsClient.name });
+				wsClient.name = null;
 				deleteUserSocketFromRoomsArray(wsClient, wsClient.room);
 				break;
 
@@ -132,7 +133,6 @@ WSS.on('connection', wsClient => {
 
 			case 'candidate':
 				console.log(`${chalk.cyanBright(wsClient.name)} wants to send an ${chalk.cyanBright('candidate')} to ${chalk.cyanBright(data.toUser)} in room ${chalk.cyanBright(wsClient.room)}`); // prettier-ignore
-
 				WSS.rooms[wsClient.room].some(socket => {
 					if (socket.name === data.toUser) {
 						sendTo(socket, {
@@ -158,6 +158,7 @@ WSS.on('connection', wsClient => {
 	/* CLIENT CLOSE BROWSER OR CONNECTION */
 	wsClient.on('close', (code, reason) => {
 		if (wsClient.name) {
+			WSS.broadcast(wsClient.room, { type: 'leave', name: wsClient.name });
 			deleteUserSocketFromRoomsArray(wsClient, wsClient.room);
 			console.log(`User[${chalk.red(wsClient.name)}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
 		}
@@ -165,8 +166,9 @@ WSS.on('connection', wsClient => {
 
 	wsClient.on('error', () => {
 		if (wsClient.name) {
+			WSS.broadcast(wsClient.room, { type: 'leave', name: wsClient.name });
 			deleteUserSocketFromRoomsArray(wsClient, wsClient.room);
+			console.log(chalk.red(`Some error after closing browsers`));
 		}
-		console.log(chalk.red(`Some error after closing browsers`));
 	});
 });
