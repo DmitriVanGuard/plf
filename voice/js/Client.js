@@ -5,12 +5,11 @@ export default class Client {
 		this.ws = new WebSocket(host);
 		this.name = '';
 		this.room = '';
-		this._onJoinRoomCallback = null;
-		this._onLeaveCallback = null;
-		this._onNewUserCallback = null;
+		this.mediaConstraints = { video: false, audio: true };
+		this.localStream = null;
+		this.remoteStream = null;
 
 		// WebRTC vars
-		this.mediaConstraints = { video: false, audio: true };
 		this.pcConfig = {
 			iceServers: [
 				{ url: 'stun:stun01.sipphone.com' },
@@ -50,10 +49,13 @@ export default class Client {
 			]
 		};
 		this.PC = {};
-		this.localStream = null;
-		this.remoteStream = null;
+
+		// Callbacks
 		this._onLocalAudioCallback = null;
 		this._onRemoteAudioCallback = null;
+		this._onJoinRoomCallback = null;
+		this._onLeaveCallback = null;
+		this._onNewUserCallback = null;
 
 		this.initSignalingChannelHandlers();
 	}
