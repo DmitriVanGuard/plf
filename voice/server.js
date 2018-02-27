@@ -101,11 +101,17 @@ WSS.on('connection', wsClient => {
 	wsClient.on('close', (code, reason) => {
 		if (wsClient.name) {
 			// deleteUserSocketFromRoomsArray(); TODO: DELETE USER
+			deleteUserSocketFromRoomsArray(wsClient, 'alpha');
 			console.log(`User[${chalk.red(wsClient.name)}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
 		}
 	});
 
-	wsClient.on('error', () => console.log(chalk.red(`Some error after closing browsers`)));
+	wsClient.on('error', () => {
+		if (wsClient.name) {
+			deleteUserSocketFromRoomsArray(wsClient, 'alpha');
+		}
+		console.log(chalk.red(`Some error after closing browsers`));
+	});
 });
 
 // ///////////////////////////
@@ -130,5 +136,3 @@ function deleteUserSocketFromRoomsArray(socket, room) {
 	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
 	if (userIndex !== -1) WSS.rooms[room].splice(userIndex, 1);
 }
-
-
