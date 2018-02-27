@@ -5,41 +5,10 @@ const WebSocket = require('ws');
 const http = require('http');
 const chalk = require('chalk');
 
-// ///////////////////////////
-// HELPER FUNCTIONS
-// ///////////////////////////
-
-/**
- * WebSocket Server broadcoasting to all clients inside room
- * @param  {string} room         Room clients to get server message
- * @param  {object} data         JSON data for clients
- * @param  {object} exceptClient WS object reference of the client to exclude
- */
-WSS.broadcast = (room, data, exceptClient = null) => {
-	WSS.rooms[room].forEach(client => {
-		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
-	});
-};
-const sendTo = (connection, message) => {
-	connection.send(JSON.stringify(message));
-};
-const isNameInUseInChosenRoom = (name, room) => {
-	return WSS.rooms[room].some(socket => socket.name === name);
-};
-const getExistingRoomUserNames = room => {
-	return WSS.rooms[room].map(socket => socket.name);
-};
-const deleteUserSocketFromRoomsArray = (socket, room) => {
-	const userIndex = WSS.rooms[room].indexOf(socket);
-	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
-	if (userIndex !== -1) WSS.rooms[room].splice(userIndex, 1);
-};
-// ///////////////////////////
-// HELPER FUNCTIONS END
-// ///////////////////////////
-
+// Static Server Setup
 const file = new staticNode.Server('./public');
 
+// HTTP Server Setup
 const server = http
 	.createServer((request, response) => {
 		console.log(`${new Date()} user enters the site`);
@@ -50,16 +19,45 @@ const server = http
 			.resume();
 	})
 	.listen(PORT);
-
 console.log(chalk.yellow('Server is running on port -> ') + chalk.bgGreen(chalk.black(PORT)));
+// ----------------
 
+// WSS Server Setup
 const WSS = new WebSocket.Server({ server });
-
 WSS.rooms = {
 	alpha: [],
 	beta: []
 };
+// ----------------
 
+// Helper Functions
+const sendTo = (connection, message) => {
+	connection.send(JSON.stringify(message));
+};
+const isNameInUseInChosenRoom = (name, room) => WSS.rooms[room].some(socket => socket.name === name);
+
+const getExistingRoomUserNames = room => WSS.rooms[room].map(socket => socket.name);
+
+const deleteUserSocketFromRoomsArray = (socket, room) => {
+	const userIndex = WSS.rooms[room].indexOf(socket);
+	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
+	if (userIndex !== -1) WSS.rooms[room].splice(userIndex, 1);
+};
+
+/**
+ * WebSocket Server broadcoasting to all clients inside room
+ * @param  {string} room         Room clients to get server message
+ * @param  {object} data         JSON data for clients
+ * @param  {object} exceptClient Client websocket to exclude
+ */
+WSS.broadcast = (room, data, exceptClient = null) => {
+	WSS.rooms[room].forEach(client => {
+		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
+	});
+};
+// ----------------
+
+// WebSocket Server Behaviour
 WSS.on('connection', wsClient => {
 	console.log(chalk.cyan(`New connection established`));
 
