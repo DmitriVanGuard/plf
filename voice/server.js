@@ -31,9 +31,20 @@ WSS.rooms = {
 // ----------------
 
 // Helper Functions
-const sendTo = (connection, message) => {
-	connection.send(JSON.stringify(message));
-};
+
+/**
+ * Stringify JSON data and send it to client
+ * @param  {object} connection Client's WebSocket to get message
+ * @param  {object} message    Data to be stringified
+ */
+const sendTo = (connection, message) => connection.send(JSON.stringify(message));
+
+/**
+ * Check if username is already in use
+ * @param  {string} name Name to check
+ * @param  {string} room Room to be checked
+ * @return {boolean}      True if name already exist
+ */
 const isNameInUseInChosenRoom = (name, room) => WSS.rooms[room].some(socket => socket.name === name);
 
 const getExistingRoomUserNames = room => WSS.rooms[room].map(socket => socket.name);
