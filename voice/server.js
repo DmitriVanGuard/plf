@@ -34,21 +34,31 @@ WSS.rooms = {
 
 /**
  * Stringify JSON data and send it to client
- * @param  {object} connection Client's WebSocket to get message
- * @param  {object} message    Data to be stringified
+ * @param  {object} socket 		-Client's WebSocket to get message
+ * @param  {object} message   -Data to be stringified
  */
-const sendTo = (connection, message) => connection.send(JSON.stringify(message));
+const sendTo = (socket, message) => socket.send(JSON.stringify(message));
 
 /**
  * Check if username is already in use
- * @param  {string} name Name to check
- * @param  {string} room Room to be checked
- * @return {boolean}      True if name already exist
+ * @param  {string} name -Name to check
+ * @param  {string} room -Room to be checked
+ * @return {boolean}     -True if name already exist
  */
 const isNameInUseInChosenRoom = (name, room) => WSS.rooms[room].some(socket => socket.name === name);
 
-const getExistingRoomUserNames = room => WSS.rooms[room].map(socket => socket.name);
+/**
+ * Get array of usernames who connected before new client
+ * @param  {string} room -Room name where to get usernames
+ * @return {array}       -New array of usernames
+ */
+const getUsernamesInChosenRoom = room => WSS.rooms[room].map(socket => socket.name);
 
+/**
+ * Delete client's websocket from room
+ * @param  {object} socket -Clients websocket to be deleted
+ * @param  {string} room   -Room where clients socket to be found
+ */
 const deleteUserSocketFromRoomsArray = (socket, room) => {
 	const userIndex = WSS.rooms[room].indexOf(socket);
 	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
@@ -57,13 +67,13 @@ const deleteUserSocketFromRoomsArray = (socket, room) => {
 
 /**
  * WebSocket Server broadcoasting to all clients inside room
- * @param  {string} room         Room clients to get server message
- * @param  {object} data         JSON data for clients
- * @param  {object} exceptClient Client websocket to exclude
+ * @param  {string} room         -Room clients to get server message
+ * @param  {object} data         -JSON data for clients
+ * @param  {object} exceptSocket -Client websocket to exclude
  */
-WSS.broadcast = (room, data, exceptClient = null) => {
+WSS.broadcast = (room, data, exceptSocket = null) => {
 	WSS.rooms[room].forEach(client => {
-		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
+		if (client !== exceptSocket && client.readyState === WebSocket.OPEN) sendTo(client, data);
 	});
 };
 // ----------------
@@ -88,7 +98,7 @@ WSS.on('connection', wsClient => {
 					break;
 				}
 				console.log(`User[${chalk.green(data.name)}] joined room ${chalk.green(data.room)}`);
-				sendTo(wsClient, { type: 'join', success: true, users: getExistingRoomUserNames(data.room) });
+				sendTo(wsClient, { type: 'join', success: true, users: getUsernamesInChosenRoom(data.room) });
 
 				wsClient.name = data.name;
 				WSS.broadcast(data.room, { type: 'newUser', name: data.name });
