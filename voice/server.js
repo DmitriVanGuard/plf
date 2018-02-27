@@ -82,7 +82,7 @@ WSS.broadcast = (room, data, exceptSocket = null) => {
 WSS.on('connection', wsClient => {
 	console.log(chalk.cyan(`New connection established`));
 
-	/* WHEN CLIENT SEND MESSAGE */
+	/* WHEN CLIENT SENDS MESSAGE */
 	wsClient.on('message', message => {
 		let data;
 		try {
@@ -97,38 +97,41 @@ WSS.on('connection', wsClient => {
 					sendTo(wsClient, { type: 'join', success: false });
 					break;
 				}
-				console.log(`User[${chalk.green(data.name)}] joined room ${chalk.green(data.room)}`);
-				sendTo(wsClient, { type: 'join', success: true, users: getUsernamesInChosenRoom(data.room) });
-
 				wsClient.name = data.name;
-				WSS.broadcast(data.room, { type: 'newUser', name: data.name });
+				wsClient.room = data.room;
 
-				WSS.rooms[data.room].push(wsClient);
+				console.log(`User[${chalk.green(data.name)}] joined room ${chalk.green(wsClient.room)}`);
+
+				sendTo(wsClient, { type: 'join', success: true, users: getUsernamesInChosenRoom(wsClient.room) });
+				WSS.broadcast(wsClient.room, { type: 'newUser', name: wsClient.name });
+
+				WSS.rooms[wsClient.room].push(wsClient);
 				break;
 
 			case 'leave':
-				WSS.broadcast(data.room, { type: 'leave', name: wsClient.name });
-				deleteUserSocketFromRoomsArray(wsClient, data.room);
+				WSS.broadcast(wsClient.room, { type: 'leave', name: wsClient.name });
+				deleteUserSocketFromRoomsArray(wsClient, wsClient.room);
 				break;
 
 			case 'offer':
-				console.log(`${chalk.magenta(wsClient.name)} wants to send an ${chalk.magenta('offer')} to ${chalk.magenta(WSS.rooms[data.room][data.toUserIndex].name)} in room ${chalk.magenta(data.room)}`); // prettier-ignore
-				sendTo(WSS.rooms[data.room][data.toUserIndex], { type: 'offer', offer: data.offer, from: wsClient.name });
+				console.log(`${chalk.magenta(wsClient.name)} wants to send an ${chalk.magenta('offer')} to ${chalk.magenta(WSS.rooms[wsClient.room][data.toUserIndex].name)} in room ${chalk.magenta(wsClient.room)}`); // prettier-ignore
+				sendTo(WSS.rooms[wsClient.room][data.toUserIndex], { type: 'offer', offer: data.offer, from: wsClient.name });
 				break;
 
 			case 'answer':
-				console.log(`${chalk.greenBright(wsClient.name)} wants to send an ${chalk.greenBright('answer')} to ${chalk.greenBright(data.toUser)} in room ${chalk.greenBright(data.room)}`); // prettier-ignore
-				for (let i = WSS.rooms[data.room].length - 1; i !== -1; i--) {
-					if (WSS.rooms[data.room][i].name === data.toUser) {
-						sendTo(WSS.rooms[data.room][i], { type: 'answer', answer: data.answer, from: wsClient.name });
+				console.log(`${chalk.greenBright(wsClient.name)} wants to send an ${chalk.greenBright('answer')} to ${chalk.greenBright(data.toUser)} in room ${chalk.greenBright(wsClient.room)}`); // prettier-ignore
+				for (let i = WSS.rooms[wsClient.room].length - 1; i !== -1; i--) {
+					if (WSS.rooms[wsClient.room][i].name === data.toUser) {
+						sendTo(WSS.rooms[wsClient.room][i], { type: 'answer', answer: data.answer, from: wsClient.name });
 						break;
 					}
 				}
 				break;
 
 			case 'candidate':
-				console.log(`${chalk.cyanBright(wsClient.name)} wants to send an ${chalk.cyanBright('candidate')} to ${chalk.cyanBright(data.toUser)} in room ${chalk.cyanBright(data.room)}`); // prettier-ignore
-				WSS.rooms[data.room].some(socket => {
+				console.log(`${chalk.cyanBright(wsClient.name)} wants to send an ${chalk.cyanBright('candidate')} to ${chalk.cyanBright(data.toUser)} in room ${chalk.cyanBright(wsClient.room)}`); // prettier-ignore
+
+				WSS.rooms[wsClient.room].some(socket => {
 					if (socket.name === data.toUser) {
 						sendTo(socket, {
 							type: 'candidate',
@@ -152,15 +155,14 @@ WSS.on('connection', wsClient => {
 	/* CLIENT CLOSE BROWSER OR CONNECTION */
 	wsClient.on('close', (code, reason) => {
 		if (wsClient.name) {
-			// deleteUserSocketFromRoomsArray(); TODO: DELETE USER
-			deleteUserSocketFromRoomsArray(wsClient, 'alpha');
+			deleteUserSocketFromRoomsArray(wsClient, wsClient.room);
 			console.log(`User[${chalk.red(wsClient.name)}] disconnected from the server\n\tCode -> ${code}\n\tReason -> ${reason}`);
 		}
 	});
 
 	wsClient.on('error', () => {
 		if (wsClient.name) {
-			deleteUserSocketFromRoomsArray(wsClient, 'alpha');
+			deleteUserSocketFromRoomsArray(wsClient, wsClient.room);
 		}
 		console.log(chalk.red(`Some error after closing browsers`));
 	});
