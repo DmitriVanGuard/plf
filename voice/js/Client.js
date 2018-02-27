@@ -114,6 +114,14 @@ export default class Client {
 		this._onRemoteAudioCallback(stream, fromUser);
 	}
 
+	removePeerFromPeerConnections(peerName) {
+		delete this.PC[peerName];
+	}
+
+	emptyPeerConnections() {
+		this.PC = {};
+	}
+
 	// ///////////////////////////
 	// SETUP/INIT METHODS
 	// ///////////////////////////

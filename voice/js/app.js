@@ -67,7 +67,9 @@ client.onNewUser(data => room.updateUsersList(data.name));
 client.onLeave(data => {
 	if (client.name !== data.name) {
 		room.removeUserFromUsersList(data.name);
+		client.removePeerFromPeerConnections(data.name);
 	} else {
+		client.emptyPeerConnections();
 		room.switchControlsDisableState(false);
 		room.localAudio.srcObject = null;
 	}
