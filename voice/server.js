@@ -5,6 +5,39 @@ const WebSocket = require('ws');
 const http = require('http');
 const chalk = require('chalk');
 
+// ///////////////////////////
+// HELPER FUNCTIONS
+// ///////////////////////////
+
+/**
+ * WebSocket Server broadcoasting to all clients inside room
+ * @param  {string} room         Room clients to get server message
+ * @param  {object} data         JSON data for clients
+ * @param  {object} exceptClient WS object reference of the client to exclude
+ */
+WSS.broadcast = (room, data, exceptClient = null) => {
+	WSS.rooms[room].forEach(client => {
+		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
+	});
+};
+const sendTo = (connection, message) => {
+	connection.send(JSON.stringify(message));
+};
+const isNameInUseInChosenRoom = (name, room) => {
+	return WSS.rooms[room].some(socket => socket.name === name);
+};
+const getExistingRoomUserNames = room => {
+	return WSS.rooms[room].map(socket => socket.name);
+};
+const deleteUserSocketFromRoomsArray = (socket, room) => {
+	const userIndex = WSS.rooms[room].indexOf(socket);
+	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
+	if (userIndex !== -1) WSS.rooms[room].splice(userIndex, 1);
+};
+// ///////////////////////////
+// HELPER FUNCTIONS END
+// ///////////////////////////
+
 const file = new staticNode.Server('./public');
 
 const server = http
@@ -113,26 +146,3 @@ WSS.on('connection', wsClient => {
 		console.log(chalk.red(`Some error after closing browsers`));
 	});
 });
-
-// ///////////////////////////
-// HELPER FUNCTIONS
-// ///////////////////////////
-WSS.broadcast = (room, data, exceptClient = null) => {
-	WSS.rooms[room].forEach(client => {
-		if (client !== exceptClient && client.readyState === WebSocket.OPEN) sendTo(client, data);
-	});
-};
-function sendTo(connection, message) {
-	connection.send(JSON.stringify(message));
-}
-function isNameInUseInChosenRoom(name, room) {
-	return WSS.rooms[room].some(socket => socket.name === name);
-}
-function getExistingRoomUserNames(room) {
-	return WSS.rooms[room].map(socket => socket.name);
-}
-function deleteUserSocketFromRoomsArray(socket, room) {
-	const userIndex = WSS.rooms[room].indexOf(socket);
-	console.log(`${chalk.red('Deleting user')} at index -> ${chalk.red(userIndex)}`);
-	if (userIndex !== -1) WSS.rooms[room].splice(userIndex, 1);
-}
