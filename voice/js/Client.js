@@ -196,19 +196,25 @@ export default class Client {
 	// ///////////////////////////
 	// COMMUNICATION METHODS
 	// ///////////////////////////
+
+	initPeerConnectionWithUser(username) {
+		this.PC[username] = new RTCPeerConnection(this.pcConfig);
+		this.PC[username].onicecandidate = this.handleIceCandidateNegotiation(username);
+		this.PC[username].onaddstream = this.handleRemoteTrackAdded(username);
+		this.PC[username].onremovestream = this.handleRemoteStreamRemoved;
+		this.PC[username].addStream(this.localStream);
+		this.PC[username].oniceconnectionstatechange = err => {
+			if (this.PC[username].iceConnectionState === 'failed') {
+				console.log(err);
+			}
+		};
+	}
+
 	createOffers(users) {
 		for (let i = 0; i < users.length; i++) {
 			console.log(`Creating offer for ${users[i]}`);
-			this.PC[users[i]] = new RTCPeerConnection(this.pcConfig);
-			this.PC[users[i]].onicecandidate = this.handleIceCandidateNegotiation(users[i]);
-			this.PC[users[i]].onaddstream = this.handleRemoteTrackAdded(users[i]);
-			this.PC[users[i]].onremovestream = this.handleRemoteStreamRemoved;
-			this.PC[users[i]].addStream(this.localStream);
-			this.PC[users[i]].oniceconnectionstatechange = err => {
-				if (this.PC[users[i]].iceConnectionState === 'failed') {
-					console.log(err);
-				}
-			};
+
+			this.initPeerConnectionWithUser(users[i]);
 
 			this.PC[users[i]]
 				.createOffer()
@@ -228,16 +234,8 @@ export default class Client {
 
 	createAnswer(offer, fromUser) {
 		console.log(`Creating answer for ${fromUser}`);
-		this.PC[fromUser] = new RTCPeerConnection(this.pcConfig);
-		this.PC[fromUser].onicecandidate = this.handleIceCandidateNegotiation(fromUser);
-		this.PC[fromUser].onaddstream = this.handleRemoteTrackAdded(fromUser);
-		this.PC[fromUser].onremovestream = this.handleRemoteStreamRemoved;
-		this.PC[fromUser].oniceconnectionstatechange = err => {
-			if (this.PC[fromUser].iceConnectionState === 'failed') {
-				console.log(err);
-			}
-		};
-		this.PC[fromUser].addStream(this.localStream);
+
+		this.initPeerConnectionWithUser(fromUser);
 
 		this.PC[fromUser].setRemoteDescription(new RTCSessionDescription(offer));
 
