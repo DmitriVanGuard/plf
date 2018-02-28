@@ -61,6 +61,53 @@ export default class Client {
 	}
 
 	// ///////////////////////////
+	// PUBLIC METHODS
+	// ///////////////////////////
+
+	getUserMedia() {
+		navigator.getUserMedia(this.mediaConstraints, stream => this.handleUserMedia(stream), this.handleUserMediaError);
+	}
+
+	addRemoteAudio(stream, fromUser) {
+		this._onRemoteAudioCallback(stream, fromUser);
+	}
+
+	removePeerFromPeerConnections(peerName) {
+		delete this.PC[peerName];
+	}
+
+	emptyPeerConnections() {
+		this.PC = {};
+	}
+
+	// ///////////////////////////
+	// PUBLIC CALLBACK INIT METHODS
+	// ///////////////////////////
+
+	/* Add callback function function to be called when the current user enters a room for first time */
+	onJoinRoom(callback) {
+		this._onJoinRoomCallback = callback;
+	}
+
+	/* Add callback function function to be called when any user leaves a room */
+	onLeave(callback) {
+		this._onLeaveCallback = callback;
+	}
+
+	/* Add callback function to be called when a new user enters a room */
+	onNewUser(callback) {
+		this._onNewUserCallback = callback;
+	}
+
+	onLocalAudio(callback) {
+		this._onLocalAudioCallback = callback;
+	}
+
+	onRemoteAudio(callback) {
+		this._onRemoteAudioCallback = callback;
+	}
+
+	// ///////////////////////////
 	// WebSocket Communication Methods
 	// ///////////////////////////
 
@@ -95,55 +142,11 @@ export default class Client {
 		});
 	}
 
-	// ///////////////////////////
-	// PUBLIC CALLBACK INIT METHODS
-	// ///////////////////////////
-
-	/* Add callback function function to be when the current user enters a room for first time */
-	onJoinRoom(callback) {
-		this._onJoinRoomCallback = callback;
-	}
-
-	/* Add callback function function to be called when any user leaves a room */
-	onLeave(callback) {
-		this._onLeaveCallback = callback;
-	}
-
-	/* Add callback function to be called when a new user enters a room */
-	onNewUser(callback) {
-		this._onNewUserCallback = callback;
-	}
-
-	getUserMedia() {
-		navigator.getUserMedia(this.mediaConstraints, stream => this.handleUserMedia(stream), this.handleUserMediaError);
-	}
-
-	onLocalAudio(callback) {
-		this._onLocalAudioCallback = callback;
-	}
-
-	onRemoteAudio(callback) {
-		this._onRemoteAudioCallback = callback;
-	}
-
-	addRemoteAudio(stream, fromUser) {
-		this._onRemoteAudioCallback(stream, fromUser);
-	}
-
-	removePeerFromPeerConnections(peerName) {
-		delete this.PC[peerName];
-	}
-
-	emptyPeerConnections() {
-		this.PC = {};
-	}
-
-	// ///////////////////////////
-	// SETUP/INIT METHODS
-	// ///////////////////////////
+	/**
+	 * Client reacting to server message(response)
+	 */
 	initSignalingChannelHandlers() {
 		this.ws.onmessage = message => {
-			// console.log('Got message', message.data);
 			const data = JSON.parse(message.data);
 
 			switch (data.type) {
