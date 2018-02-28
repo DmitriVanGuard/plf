@@ -61,11 +61,21 @@ export default class Client {
 	}
 
 	// ///////////////////////////
-	// PUBLIC METHODS
+	// WebSocket Communication Methods
 	// ///////////////////////////
+
+	/**
+	 * Custom WebSocket send wrapper to auto send json
+	 * @param  {object} data -Data to be send
+	 */
 	sendJSONToServer(data) {
 		this.ws.send(JSON.stringify(data));
 	}
+
+	/**
+	 * Client sends to server name of the room that he wants to join
+	 * @param  {string} room -Name of the room
+	 */
 	joinRoom(room) {
 		this.room = room;
 		this.sendJSONToServer({
@@ -74,6 +84,10 @@ export default class Client {
 			name: this.name
 		});
 	}
+
+	/**
+	 * Client send msg about leaving the room
+	 */
 	leaveRoom() {
 		this.sendJSONToServer({
 			type: 'leave',
