@@ -181,7 +181,7 @@ export default class Client {
 					this.createAnswer(data.offer, data.from);
 					break;
 				case 'answer':
-					this.setRemoteDescription(data.answer, data.from);
+					this.setPeerRemoteDescription(data.answer, data.from);
 					break;
 				case 'candidate':
 					this.addCandidate(data);
@@ -197,6 +197,10 @@ export default class Client {
 	// COMMUNICATION METHODS
 	// ///////////////////////////
 
+	/**
+	 * Creating new RTCPeerConnection and setting up all necessary handle functions
+	 * @param  {string} username -It will be object property that contains RTCPeerConnection object
+	 */
 	initPeerConnectionWithUser(username) {
 		this.PC[username] = new RTCPeerConnection(this.pcConfig);
 		this.PC[username].onicecandidate = this.handleIceCandidateNegotiation(username);
@@ -210,6 +214,10 @@ export default class Client {
 		};
 	}
 
+	/**
+	 * Initializing peer connection with existing users and creating offers to them
+	 * @param  {array} users -Array of usernames to send offer
+	 */
 	createOffers(users) {
 		for (let i = 0; i < users.length; i++) {
 			console.log(`Creating offer for ${users[i]}`);
@@ -225,13 +233,17 @@ export default class Client {
 						toUserIndex: i,
 						offer
 					});
-					// create;
 					this.PC[users[i]].setLocalDescription(offer);
 				})
 				.catch(this.handleCreateOfferError);
 		}
 	}
 
+	/**
+	 * Initializing peer connection with specific user and creating answer for him
+	 * @param  {object} offer    -WebRTC Offer object
+	 * @param  {string} fromUser -Username who sent to us an offer -> creating him an answer
+	 */
 	createAnswer(offer, fromUser) {
 		console.log(`Creating answer for ${fromUser}`);
 
@@ -253,11 +265,19 @@ export default class Client {
 			.catch(this.handleCreateAnswerError);
 	}
 
-	setRemoteDescription(answer, fromUser) {
-		// Call RTCPeerConnection method setRemoteDescription (not Client class)
+	/**
+	 * Setting up peer remote description based on answer
+	 * @param {object} answer   -WebRTC answer object
+	 * @param {string} fromUser -username who sent us an answer
+	 */
+	setPeerRemoteDescription(answer, fromUser) {
 		this.PC[fromUser].setRemoteDescription(new RTCSessionDescription(answer));
 	}
 
+	/**
+	 * Adding ice candidate peer connection
+	 * @param {object} data -Object contains username and webRTC candidate object
+	 */
 	addCandidate(data) {
 		console.log(`Ice candidate data`, data);
 		this.PC[data.fromUser].addIceCandidate(new RTCIceCandidate(data.candidate));
