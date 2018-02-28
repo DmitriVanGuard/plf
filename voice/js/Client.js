@@ -100,25 +100,27 @@ export default class Client {
 	// PUBLIC CALLBACK INIT METHODS
 	// ///////////////////////////
 
-	/* Add callback function function to be called when the current user enters a room for first time */
+	/* Callback function to be called when the current user enters a room for first time */
 	onJoinRoom(callback) {
 		this._onJoinRoomCallback = callback;
 	}
 
-	/* Add callback function function to be called when any user leaves a room */
+	/* Callback function to be called when any user leaves a room */
 	onLeave(callback) {
 		this._onLeaveCallback = callback;
 	}
 
-	/* Add callback function to be called when a new user enters a room */
+	/* Callback to be called when a new user enters a room */
 	onNewUser(callback) {
 		this._onNewUserCallback = callback;
 	}
 
+	/** Callback to be called when a local audio access granted */
 	onLocalAudio(callback) {
 		this._onLocalAudioCallback = callback;
 	}
 
+	/** Callback to be called when a remote audio is delivered */
 	onRemoteAudio(callback) {
 		this._onRemoteAudioCallback = callback;
 	}
