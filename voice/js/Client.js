@@ -286,12 +286,21 @@ export default class Client {
 	// ///////////////////////////
 	// HANDLERS
 	// ///////////////////////////
+
+	/**
+	 * Setting up localStream and calling client side callback
+	 * @param  {object} stream -Local MediaStream object
+	 */
 	handleUserMedia(stream) {
-		// console.log('Adding local stream');
 		this.localStream = stream;
 		this._onLocalAudioCallback(stream);
 	}
 
+	/**
+	 * Initializing event handler that will be called when onicecandidate event occurs
+	 * @param  {string} toUser -username to whom send candidate
+	 * @return {function}      -Event handler
+	 */
 	handleIceCandidateNegotiation(toUser) {
 		return event => {
 			if (event.candidate) {
@@ -299,17 +308,21 @@ export default class Client {
 					type: 'candidate',
 					candidate: event.candidate,
 					room: this.room,
-					toUser: toUser
+					toUser
 				});
 			}
 		};
 	}
 
-	handleRemoteTrackAdded(from) {
-		console.log('Track added event');
+	/**
+	 * Initializing event handler that will be called when remotestreamadd event occurs
+	 * @param  {string} fromUser -Remote stream owner username
+	 * @return {function}   		 -Event handler
+	 */
+	handleRemoteTrackAdded(fromUser) {
 		return event => {
 			console.log('Remote stream added');
-			this.addRemoteAudio(event.stream, from);
+			this.addRemoteAudio(event.stream, fromUser);
 			this.remoteStream = event.stream;
 		};
 	}
@@ -317,6 +330,10 @@ export default class Client {
 	handleRemoteStreamRemoved(event) {
 		console.log('Remote streem removed. Event:', event);
 	}
+
+	// ///////////////////////////
+	// ERROR HANDLERS
+	// ///////////////////////////
 	handleUserMediaError(error) {
 		console.log('getUserMedia error:', error);
 	}
@@ -326,6 +343,4 @@ export default class Client {
 	handleCreateAnswerError(error) {
 		console.log('createAnswer() error:', error);
 	}
-
-	// Check this function
 }
