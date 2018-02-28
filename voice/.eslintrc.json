@@ -6,9 +6,9 @@
 		"sourceType": "module"
 	},
 	"env": {
-		"es6": true, //Not change global var-ls like that exist in es6?
-		"browser": true, // -//- window, document
-		"node": true //process.env
+		"es6": true,
+		"browser": true,
+		"node": true
 	},
 	"rules": {
 		"no-console": "off",
