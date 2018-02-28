@@ -264,7 +264,7 @@ export default class Client {
 	}
 
 	/**
-	 * Setting up peer remote description based on answer
+	 * Setting up peer remote description based on answer, after receiving "answer" message
 	 * @param {object} answer   -WebRTC answer object
 	 * @param {string} fromUser -username who sent us an answer
 	 */
@@ -273,7 +273,7 @@ export default class Client {
 	}
 
 	/**
-	 * Adding ice candidate peer connection
+	 * Adding ice candidate peer connection after receiving "candidate" message
 	 * @param {object} data -Object contains username and webRTC candidate object
 	 */
 	addCandidate(data) {
@@ -305,7 +305,7 @@ export default class Client {
 				this.negotiationPeers.push(toUser);
 				this.sendJSONToServer({
 					type: 'candidate',
-					candidate: event.candidate,
+					candidate: evt.candidate,
 					room: this.room,
 					toUser
 				});
