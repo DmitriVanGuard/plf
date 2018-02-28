@@ -40,10 +40,6 @@ export default class Room {
 		target.remove();
 	}
 
-	// /////////////////////////////
-	// Helper functions
-	// /////////////////////////////
-
 	/**
 	 * Creates new list item and audio in room interface
 	 * @param  {string} username -Client's username to be added

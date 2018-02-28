@@ -66,7 +66,3 @@ client.onRemoteAudio((stream, fromUser) => {
 	const item = room.usersList.querySelector(`li[data-name="${fromUser}"]`);
 	item.lastElementChild.srcObject = stream;
 });
-
-// /////////////////////////////
-// HELPER FUNCTIONS
-// /////////////////////////////

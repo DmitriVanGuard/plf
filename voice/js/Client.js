@@ -82,7 +82,6 @@ export default class Client {
 	/**
 	 * Deleting another peer from PC object
 	 * @param  {username} peerName -Property name to be deleted
-	 * @return {boolean}           -Delete operation success
 	 */
 	closePeerFromPeerConnections(peerName) {
 		this.PC[peerName].close();
