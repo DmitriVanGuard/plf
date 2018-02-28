@@ -209,24 +209,7 @@ export default class Client {
 		this.PC[username].onaddstream = this.handleRemoteTrackAdded(username);
 		this.PC[username].onremovestream = this.handleRemoteStreamRemoved;
 		this.PC[username].addStream(this.localStream);
-		this.PC[username].oniceconnectionstatechange = err => {
-			switch (this.PC[username].iceConnectionState) {
-				case 'connected':
-					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
-					break;
-				case 'failed':
-				case 'closed':
-				case 'disconnected':
-					console.log(
-						`Failed to establish peer connection with ${username}. Connection status -> ${this.PC[username].iceConnectionState} \n`,
-						err
-					);
-					delete this.PC[username];
-					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
-					break;
-				default:
-			}
-		};
+		this.PC[username].oniceconnectionstatechange = this.handleIceConnectionStateChange(username);
 	}
 
 	/**
@@ -317,8 +300,8 @@ export default class Client {
 	 * @return {function}      -Event handler
 	 */
 	handleIceCandidateNegotiation(toUser) {
-		return event => {
-			if (event.candidate && this.negotiationPeers.indexOf(toUser) === -1) {
+		return evt => {
+			if (evt.candidate && this.negotiationPeers.indexOf(toUser) === -1) {
 				this.negotiationPeers.push(toUser);
 				this.sendJSONToServer({
 					type: 'candidate',
@@ -331,20 +314,47 @@ export default class Client {
 	}
 
 	/**
+	 * Initializing event handler that will be called when oniceconnectionstatechange event occurs
+	 * @param  {string} username -Peer username
+	 * @return {function}        -Event handler
+	 */
+	handleIceConnectionStateChange(username) {
+		return evt => {
+			switch (this.PC[username].iceConnectionState) {
+				case 'connected':
+					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
+					break;
+				case 'failed':
+				case 'closed':
+				case 'disconnected':
+					console.log(
+						`Failed to establish peer connection with ${username}. Connection status -> ${this.PC[username].iceConnectionState} \n`,
+						evt
+					);
+					delete this.PC[username];
+					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
+					break;
+				default:
+					break;
+			}
+		};
+	}
+
+	/**
 	 * Initializing event handler that will be called when remotestreamadd event occurs
 	 * @param  {string} fromUser -Remote stream owner username
 	 * @return {function}   		 -Event handler
 	 */
 	handleRemoteTrackAdded(fromUser) {
-		return event => {
+		return evt => {
 			console.log('Remote stream added');
-			this.addRemoteAudio(event.stream, fromUser);
-			this.remoteStream = event.stream;
+			this.addRemoteAudio(evt.stream, fromUser);
+			this.remoteStream = evt.stream;
 		};
 	}
 
-	handleRemoteStreamRemoved(event) {
-		console.log('Remote streem removed. Event:', event);
+	handleRemoteStreamRemoved(evt) {
+		console.log('Remote streem removed. Event ->', evt);
 	}
 
 	// ///////////////////////////
