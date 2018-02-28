@@ -33,7 +33,7 @@ WSS.rooms = {
 // Helper Functions
 
 /**
- * Stringify JSON data and send it to client
+ * Stringify data and send it to client
  * @param  {object} socket 		-Client's WebSocket to get message
  * @param  {object} message   -Data to be stringified
  */
