@@ -64,18 +64,34 @@ export default class Client {
 	// PUBLIC METHODS
 	// ///////////////////////////
 
+	/**
+	 * Get client's user media (audio)
+	 */
 	getUserMedia() {
 		navigator.getUserMedia(this.mediaConstraints, stream => this.handleUserMedia(stream), this.handleUserMediaError);
 	}
 
+	/**
+	 * Manually adding remote audio
+	 * @param {object} stream   -Other client's MediaStream
+	 * @param {string} fromUser -Other client's username
+	 */
 	addRemoteAudio(stream, fromUser) {
 		this._onRemoteAudioCallback(stream, fromUser);
 	}
 
+	/**
+	 * Deleting another peer from PC object
+	 * @param  {username} peerName -Property name to be deleted
+	 * @return {boolean}           -Delete operation success
+	 */
 	removePeerFromPeerConnections(peerName) {
-		delete this.PC[peerName];
+		return delete this.PC[peerName];
 	}
 
+	/**
+	 * Simply reassign PC object in order to delete old one
+	 */
 	emptyPeerConnections() {
 		this.PC = {};
 	}
