@@ -49,6 +49,7 @@ export default class Client {
 			]
 		};
 		this.PC = {};
+		this.negotiationPeers = [];
 
 		// Callbacks
 		this._onLocalAudioCallback = null;
@@ -208,8 +209,18 @@ export default class Client {
 		this.PC[username].onremovestream = this.handleRemoteStreamRemoved;
 		this.PC[username].addStream(this.localStream);
 		this.PC[username].oniceconnectionstatechange = err => {
-			if (this.PC[username].iceConnectionState === 'failed') {
-				console.log(err);
+			switch (this.PC[username].iceConnectionState) {
+				case 'completed':
+					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
+					break;
+				case 'failed':
+				case 'closed':
+				case 'disconnected':
+					console.log(`Failed to establish peer connection with ${username} \n`, err);
+					delete this.PC[username];
+					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
+					break;
+				default:
 			}
 		};
 	}
@@ -303,7 +314,8 @@ export default class Client {
 	 */
 	handleIceCandidateNegotiation(toUser) {
 		return event => {
-			if (event.candidate) {
+			if (event.candidate && this.negotiationPeers.indexOf(toUser) === -1) {
+				this.negotiationPeers.push(toUser);
 				this.sendJSONToServer({
 					type: 'candidate',
 					candidate: event.candidate,
@@ -334,6 +346,7 @@ export default class Client {
 	// ///////////////////////////
 	// ERROR HANDLERS
 	// ///////////////////////////
+
 	handleUserMediaError(error) {
 		console.log('getUserMedia error:', error);
 	}
