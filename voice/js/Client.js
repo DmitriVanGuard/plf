@@ -1,5 +1,3 @@
-require('webrtc-adapter');
-
 export default class Client {
 	constructor(host) {
 		this.ws = new WebSocket(host);
@@ -86,15 +84,18 @@ export default class Client {
 	 * @param  {username} peerName -Property name to be deleted
 	 * @return {boolean}           -Delete operation success
 	 */
-	removePeerFromPeerConnections(peerName) {
-		return delete this.PC[peerName];
+	closePeerFromPeerConnections(peerName) {
+		this.PC[peerName].close();
 	}
 
 	/**
 	 * Simply reassign PC object in order to delete old one
 	 */
-	emptyPeerConnections() {
-		this.PC = {};
+	closePeerConnections() {
+		const peers = Object.keys(this.PC);
+		for (let i = 0; i < peers.length; i++) {
+			this.PC[peers[i]].close();
+		}
 	}
 
 	// ///////////////////////////
@@ -210,13 +211,16 @@ export default class Client {
 		this.PC[username].addStream(this.localStream);
 		this.PC[username].oniceconnectionstatechange = err => {
 			switch (this.PC[username].iceConnectionState) {
-				case 'completed':
+				case 'connected':
 					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
 					break;
 				case 'failed':
 				case 'closed':
 				case 'disconnected':
-					console.log(`Failed to establish peer connection with ${username} \n`, err);
+					console.log(
+						`Failed to establish peer connection with ${username}. Connection status -> ${this.PC[username].iceConnectionState} \n`,
+						err
+					);
 					delete this.PC[username];
 					this.negotiationPeers.splice(this.negotiationPeers.indexOf(username), 1);
 					break;

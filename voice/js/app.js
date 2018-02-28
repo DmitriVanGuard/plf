@@ -1,3 +1,4 @@
+import 'webrtc-adapter';
 import Client from './Client';
 import Room from './Room';
 
@@ -67,9 +68,9 @@ client.onNewUser(data => room.updateUsersList(data.name));
 client.onLeave(data => {
 	if (client.name !== data.name) {
 		room.removeUserFromUsersList(data.name);
-		client.removePeerFromPeerConnections(data.name);
+		client.closePeerFromPeerConnections(data.name);
 	} else {
-		client.emptyPeerConnections();
+		client.closePeerConnections();
 		room.switchControlsDisableState(false);
 		room.localAudio.srcObject = null;
 	}
