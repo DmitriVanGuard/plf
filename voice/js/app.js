@@ -16,28 +16,13 @@ room.controlForm.loginBtn.onclick = () => {
 
 	return console.log(`You[${client.name}] joined channel ${room.controlForm.roomChoice.value}`);
 };
+room.controlForm.loginBtn.ontouchstart = room.controlForm.loginBtn.onclick;
 
 room.controlForm.logoutBtn.onclick = () => {
 	client.leaveRoom();
 	room.cleanRoom();
 };
-room.controlForm.loginBtn.ontouchstart = () => {
-	if (room.controlForm.userNameInput.value === '') return alert('Please, enter your name');
-
-	client.name = room.controlForm.userNameInput.value;
-	client.joinRoom(room.controlForm.roomChoice.value);
-
-	return console.log(`You[${client.name}] joined channel ${room.controlForm.roomChoice.value}`);
-};
-
-room.controlForm.logoutBtn.onclick = () => {
-	client.leaveRoom();
-	room.cleanRoom();
-};
-room.controlForm.logoutBtn.ontouchstart = () => {
-	client.leaveRoom();
-	room.cleanRoom();
-};
+room.controlForm.logoutBtn.ontouchstart = room.controlForm.logoutBtn.onclick;
 
 // /////////////////////////////
 // WebSocket Callback Handlers

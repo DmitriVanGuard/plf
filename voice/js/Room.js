@@ -11,6 +11,7 @@ export default class Room {
 		const arrayOfUserNames = Array.isArray(usernames);
 		let nodeToAppend = null;
 		console.log(usernames);
+
 		if (arrayOfUserNames === true) {
 			const frag = document.createDocumentFragment();
 			for (let i = 0; i < usernames.length; i++) {
@@ -19,7 +20,7 @@ export default class Room {
 			}
 			nodeToAppend = frag;
 		} else {
-			// usernames это не массив, а String - одно единственное имя
+			// usernames не массив, а String - одно единственное имя
 			nodeToAppend = this.createNewListItemInUsersList(usernames);
 		}
 		return this.usersList.appendChild(nodeToAppend);
@@ -42,6 +43,12 @@ export default class Room {
 	// /////////////////////////////
 	// Helper functions
 	// /////////////////////////////
+
+	/**
+	 * Creates new list item and audio in room interface
+	 * @param  {string} username -Client's username to be added
+	 * @return {HTMLLIElement}   -li HTML element which contains username as text and audio for remote audio
+	 */
 	createNewListItemInUsersList(username) {
 		const item = document.createElement('li');
 		item.setAttribute('data-name', username);
@@ -53,7 +60,10 @@ export default class Room {
 		return item;
 	}
 
-	/* When logout is disabled, all others are enabled and vice versa */
+	/**
+	 * Disable user control depending on logged in status
+	 * @param  {boolean} state -TRUE=user logged in room, FALSE=user is not logged in
+	 */
 	switchControlsDisableState(state) {
 		this.controlForm.userNameInput.disabled = state;
 		this.controlForm.loginBtn.disabled = state;
